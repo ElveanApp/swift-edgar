@@ -4,7 +4,8 @@ import PackageDescription
 let package = Package(
     name: "swift-edgar",
     platforms: [
-        .macOS(.v13)
+        .macOS(.v13),
+        .iOS(.v16)
     ],
     products: [
         .library(name: "Edgar", targets: ["Edgar"]),

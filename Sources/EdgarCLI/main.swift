@@ -1,6 +1,9 @@
 import Foundation
 import Edgar
 
+#if !os(macOS)
+@main struct EdgarCLI { static func main() {} }
+#else
 @main
 struct EdgarCLI {
     static func main() async {
@@ -225,3 +228,4 @@ extension Array {
         indices.contains(index) ? self[index] : nil
     }
 }
+#endif
