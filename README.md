@@ -1,11 +1,12 @@
 # Edgar
 
-**A native Swift library for SEC EDGAR — company filings, financial data, insider trades, and fund holdings. Zero external dependencies, Foundation only.**
+**A native Swift library and CLI for SEC EDGAR — company filings, financial data, insider trades, and fund holdings. Zero external dependencies, Foundation only.**
 
 [![](https://img.shields.io/badge/Swift-5.9-orange)](https://swift.org)
 [![](https://img.shields.io/badge/platform-macOS%2013%2B%20|%20iOS%2016%2B-lightgrey)](https://swift.org)
 [![](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
-[![](https://img.shields.io/badge/Swift%20Package%20Index-Coming%20Soon-blue)](https://swiftpackageindex.com)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FElveanApp%2Fswift-edgar%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/ElveanApp/swift-edgar)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FElveanApp%2Fswift-edgar%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/ElveanApp/swift-edgar)
 
 Built with Swift concurrency — async/await and actors throughout. The only dependency is Foundation. Parses 13F XML, N-PORT XML, and Form 4 XML using native `Foundation.XMLParser`.
 
@@ -21,6 +22,37 @@ let revenue = facts.latestValue("Revenues")
 
 // Recent insider trades
 let trades = try await edgar.recentInsiderTrades(cik: 320193)
+```
+
+---
+
+## CLI
+
+The `edgar` command-line tool is included in the same package — query SEC EDGAR from your terminal.
+
+```bash
+# Build and run
+swift run edgar portfolio AAPL
+
+# Or install globally
+swift build -c release
+cp .build/release/edgar /usr/local/bin/
+```
+
+```bash
+$ edgar portfolio BRK-B
+BERKSHIRE HATHAWAY INC — 13F Portfolio
+Filing: 2026-05-15
+Name                           Shares   Value (k$)     Ticker     Type
+AMERICAN EXPRESS CO            14906104 $4508798489       AXP      COM
+COCA COLA CO                   28272272 $2150106354        KO      COM
+...
+
+$ edgar financial AAPL Revenues
+$ edgar insider MSFT
+$ edgar 8k GOOGL
+$ edgar search NVIDIA
+$ edgar fund VOO
 ```
 
 ---
