@@ -33,7 +33,8 @@ struct EdgarCLI {
                 let results = try await edgar.searchCompanies(query)
                 guard !results.isEmpty else { fail("No companies found for '\(query)'") }
                 for r in results.prefix(20) {
-                    print("CIK \(String(format: "%010d", r.cik))  \(r.ticker.map { String(format: "%-6s", $0) } ?? "      ")  \(r.name)")
+                    let ticker = r.ticker.map { pad($0, to: 6) } ?? "      "
+                    print("CIK \(pad(String(r.cik), to: 10, pad: "0", align: .left))  \(ticker)  \(r.name)")
                 }
 
             case "portfolio":
@@ -51,7 +52,7 @@ struct EdgarCLI {
                     print("\(conceptData.entityName) — \(conceptData.label)")
                     print(String(repeating: "-", count: 80))
                     for point in conceptData.usdValues.prefix(8) {
-                        print("\(point.end)  \(point.form.padding(toLength: 5, withPad: " ", startingAt: 0))  $\(formatNumber(point.val))")
+                        print("\(point.end)  \(pad(point.form, to: 5))  $\(formatNumber(point.val))")
                     }
                 } else {
                     let facts = try await edgar.companyFacts(cik: cik)
@@ -62,8 +63,8 @@ struct EdgarCLI {
                     for name in names.sorted().prefix(30) {
                         guard let concept = facts.concept(name) else { continue }
                         if let value = facts.latestValue(name) {
-                            let label = concept.label.map { String($0.prefix(60)) } ?? name
-                            print("  \(String(format: "%-40s", String(String(label).prefix(40))))  $\(formatNumber(value))")
+                            let label = concept.label.map { String($0.prefix(40)) } ?? name
+                            print("  \(pad(label, to: 40))  $\(formatNumber(value))")
                         }
                     }
                 }
@@ -126,7 +127,7 @@ private func resolveCIK(_ edgar: Edgar, _ query: String) async throws -> Int {
 private func printCompany(_ company: Company) {
     print(company.name)
     print(String(repeating: "-", count: 60))
-    print("CIK:        \(String(format: "%010d", company.cik))")
+    print("CIK:        \(pad(String(company.cik), to: 10, pad: "0", align: .left))")
     if !company.tickers.isEmpty { print("Tickers:    \(company.tickers.joined(separator: ", "))") }
     if !company.exchanges.isEmpty { print("Exchanges:  \(company.exchanges.joined(separator: ", "))") }
     if let sic = company.sic { print("SIC:        \(sic) — \(company.sicDescription ?? "")") }
@@ -139,20 +140,15 @@ private func printPortfolio(_ portfolio: Portfolio) {
     print("Filing: \(portfolio.filing.filingDate)")
     print(String(repeating: "-", count: 80))
     let sorted = portfolio.holdings.sorted { $0.value > $1.value }
-    print(String(format: "%-30s %8s %12s  %-8s %-8s",
-                  "Name", "Shares", "Value (k$)", "Ticker", "Type"))
+    print("\(pad("Name", to: 30)) \(pad("Shares", to: 8)) \(pad("Value (k$)", to: 11))  \(pad("Ticker", to: 8, align: .right)) \(pad("Type", to: 8, align: .right))")
     print(String(repeating: "-", count: 80))
     for h in sorted {
         let ticker = h.ticker ?? h.cusip
         let type = h.putCall?.rawValue ?? h.titleOfClass
-        print(String(format: "%-30.30s %8d $%11d  %-8s %-8s",
-                      String(h.nameOfIssuer.prefix(30)),
-                      h.shares,
-                      h.value,
-                      String(ticker.prefix(8)),
-                      String(type.prefix(8))))
+        print("\(pad(String(h.nameOfIssuer.prefix(30)), to: 30)) \(pad(String(h.shares), to: 8)) \(pad("$" + String(h.value), to: 11))  \(pad(String(ticker.prefix(8)), to: 8, align: .right)) \(pad(String(type.prefix(8)), to: 8, align: .right))")
     }
-    print("\n\(sorted.count) holdings  |  Total value: $\(sorted.reduce(0) { $0 + $1.value })k")
+    let total = sorted.reduce(0) { $0 + $1.value }
+    print("\n\(sorted.count) holdings  |  Total value: $\(total)k")
 }
 
 private func printFund(_ fund: FundPortfolio) {
@@ -162,27 +158,37 @@ private func printFund(_ fund: FundPortfolio) {
     let top = fund.topHoldings(20)
     for (i, h) in top.enumerated() {
         let name = h.title ?? h.name
-        print(String(format: "%3d. %-40.40s $%12s",
-                      i + 1, String(name.prefix(40)), formatNumber(h.value)))
+        print("\(pad(String(i + 1), to: 3, align: .right)). \(pad(String(name.prefix(40)), to: 40)) \(pad("$" + formatNumber(h.value), to: 14))")
     }
-    print("\n\(fund.holdingCount) total holdings  |  Total assets: \(fund.totalAssets.map { "$\(formatNumber($0))" } ?? "N/A")")
+    let assets = fund.totalAssets.map { "$\(formatNumber($0))" } ?? "N/A"
+    print("\n\(fund.holdingCount) total holdings  |  Total assets: \(assets)")
+}
+
+// MARK: - Formatting
+
+private enum Align { case left, right }
+
+private func pad(_ s: String, to width: Int, pad char: Character = " ", align: Align = .left) -> String {
+    let diff = width - s.count
+    if diff <= 0 { return String(s.prefix(width)) }
+    switch align {
+    case .left:  return s + String(repeating: char, count: diff)
+    case .right: return String(repeating: char, count: diff) + s
+    }
 }
 
 private func formatNumber(_ value: Int) -> String { formatNumber(Double(value)) }
 private func formatNumber(_ value: Double) -> String {
     let absValue = abs(value)
+    let n: String
     switch absValue {
-    case 1_000_000_000_000...:
-        return String(format: "%.2fT", value / 1_000_000_000_000)
-    case 1_000_000_000...:
-        return String(format: "%.2fB", value / 1_000_000_000)
-    case 1_000_000...:
-        return String(format: "%.2fM", value / 1_000_000)
-    case 1_000...:
-        return String(format: "%.0f", value)
-    default:
-        return String(format: "%.2f", value)
+    case 1_000_000_000_000...: n = String(format: "%.2f", value / 1_000_000_000_000) + "T"
+    case 1_000_000_000...:     n = String(format: "%.2f", value / 1_000_000_000) + "B"
+    case 1_000_000...:         n = String(format: "%.2f", value / 1_000_000) + "M"
+    case 1_000...:             n = String(format: "%.0f", value)
+    default:                   n = String(format: "%.2f", value)
     }
+    return n
 }
 
 private func printUsage() {
