@@ -7,6 +7,8 @@
 [![](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FElveanApp%2Fswift-edgar%2Fbadge%3Ftype%3Dswift-versions&cacheSeconds=1)](https://swiftpackageindex.com/ElveanApp/swift-edgar)
 [![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FElveanApp%2Fswift-edgar%2Fbadge%3Ftype%3Dplatforms&cacheSeconds=1)](https://swiftpackageindex.com/ElveanApp/swift-edgar)
+[![](https://img.shields.io/github/actions/workflow/status/ElveanApp/swift-edgar/ci.yml)](https://github.com/ElveanApp/swift-edgar/actions)
+[![](https://img.shields.io/badge/brew-install%20edgar-teal)](https://github.com/ElveanApp/homebrew-tap)
 
 Built with Swift concurrency — async/await and actors throughout. The only dependency is Foundation. Parses 13F XML, N-PORT XML, and Form 4 XML using native `Foundation.XMLParser`.
 
