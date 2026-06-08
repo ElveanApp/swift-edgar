@@ -1,6 +1,6 @@
 # Edgar
 
-**A native Swift library and CLI for SEC EDGAR — company filings, financial data, insider trades, and fund holdings, with zero external dependencies.**
+**A native Swift library for SEC EDGAR — company filings, financial data, insider trades, and fund holdings. Zero external dependencies, Foundation only.**
 
 [![](https://img.shields.io/badge/Swift-5.9-orange)](https://swift.org)
 [![](https://img.shields.io/badge/platform-macOS%2013%2B%20|%20iOS%2016%2B-lightgrey)](https://swift.org)
