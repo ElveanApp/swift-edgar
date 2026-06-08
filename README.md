@@ -200,8 +200,52 @@ let text = try await edgar.filingText(cik: 320193, filing: filing)
 - **Hedge fund tracking** — monitor 13F portfolios and detect quarter-over-quarter changes in institutional positions
 - **Equity research** — pull financial data, insider trades, and 8-K events for any public company
 - **Screening** — run cross-company comparisons using the XBRL Frames API
-- **AI agent tooling** — give LLMs structured access to SEC filings via MCP servers
 - **Automated alerts** — detect Form 4 insider sales, 8-K material events, and 13F portfolio changes
+
+## AI Agent Integration
+
+`edgar` is a single binary with no dependencies — any AI agent that can invoke CLI tools can use it to pull live SEC data. Install once:
+
+```bash
+brew tap ElveanApp/tap && brew install edgar
+```
+
+### Claude Code
+
+Add to `.claude/settings.json`:
+
+```json
+{
+  "permissions": {
+    "allow": [
+      "Bash(edgar *)"
+    ]
+  }
+}
+```
+
+Then just ask: "Pull Berkshire's latest 13F portfolio and summarize the biggest changes."
+
+### OpenClaw / OpenCode
+
+In your project config or prompt:
+
+```
+Tool: edgar
+  Description: Query SEC EDGAR data — 13F portfolios, XBRL financials, insider trades, 8-K events, fund holdings, company search.
+  Commands:
+    edgar portfolio <ticker|CIK>          Latest 13F holdings
+    edgar financial <ticker|CIK> [concept]  XBRL financial data
+    edgar insider <ticker|CIK>            Recent insider trades
+    edgar 8k <ticker|CIK>                Material events
+    edgar fund <ticker|CIK>              N-PORT fund holdings
+    edgar search <name>                  Company search
+    edgar company <ticker|CIK>           Company info
+```
+
+### Any agent with shell access
+
+The CLI writes plain text to stdout — no JSON parsing required. Any agent that can run `edgar portfolio AAPL` in a subprocess gets structured financial data immediately.
 
 ## SEC EDGAR Compliance
 
