@@ -9,9 +9,11 @@ let package = Package(
     ],
     products: [
         .library(name: "Edgar", targets: ["Edgar"]),
+        .executable(name: "edgar", targets: ["EdgarCLI"]),
     ],
     targets: [
         .target(name: "Edgar"),
+        .executableTarget(name: "EdgarCLI", dependencies: ["Edgar"]),
         .testTarget(name: "EdgarTests", dependencies: ["Edgar"]),
     ]
 )
