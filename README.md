@@ -28,16 +28,23 @@ let trades = try await edgar.recentInsiderTrades(cik: 320193)
 
 ## CLI
 
-The `edgar` command-line tool is included in the same package — query SEC EDGAR from your terminal.
+Query SEC EDGAR from your terminal.
+
+### Install
 
 ```bash
-# Build and run
-swift run edgar portfolio AAPL
+brew tap ElveanApp/tap
+brew install edgar
+```
 
-# Or install globally
+Or build from source:
+
+```bash
 swift build -c release
 cp .build/release/edgar /usr/local/bin/
 ```
+
+### Usage
 
 ```bash
 $ edgar portfolio BRK-B
