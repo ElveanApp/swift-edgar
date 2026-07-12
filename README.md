@@ -266,6 +266,10 @@ let edgar = Edgar(userAgent: "MyApp/1.0 (you@example.com)")
 - macOS 13+ / iOS 16+
 - No external dependencies — Foundation only
 
+## Powered by Edgar
+
+This library powers financial research workflows inside [Elvean](https://elvean.app) — a native AI workspace for macOS. Elvean's equity research features use Edgar to pull SEC filings, 13F portfolios, financial data, and insider trades, then render them as interactive charts, sortable tables, and structured analysis alongside AI-powered insights.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
